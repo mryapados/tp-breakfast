@@ -1,0 +1,10 @@
+<form ng-controller="FormPersonneCtrl" ng-show="visible">
+	<label>Nom:</label><input name="nom" ng-model="selectedPersonne.nom" />
+	<br /> <label>Prénom:</label><input name="prenom"
+		ng-model="selectedPersonne.prenom" /> <br /> 
+		
+		<input type="button"
+		value="Annuler" ng-click="cancel()" />
+		<input type="button"
+		value="valider" ng-click="save()" />
+</form>

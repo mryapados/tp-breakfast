@@ -1,0 +1,9 @@
+.button_menu {
+	cursor: pointer;
+	color: #0000FF;
+	text-decoration: underline;
+}
+
+.button_menu_active {
+	color: #FF0000;
+}
