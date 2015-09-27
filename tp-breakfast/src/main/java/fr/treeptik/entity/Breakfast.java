@@ -1,65 +1,53 @@
 package fr.treeptik.entity;
 
-import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.JoinColumn;
 
 @Entity
 @Table(name = "breakfast")
-public class Breakfast implements Serializable {
+public class Breakfast extends Event {
 
 	private static final long serialVersionUID = 1L;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
 	
-	private Float prix;
+	@Column
+	private Float price;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
 		name = "compose", 
 		joinColumns = { 
-			@JoinColumn(name = "breakfast", 
+			@JoinColumn(name = "idbreakfast", 
 			referencedColumnName = "id")}, 
 		inverseJoinColumns = {
-			@JoinColumn(name = "ingredient", 
+			@JoinColumn(name = "idingredient", 
 			referencedColumnName = "id")})
-	private List<Ingredient> ingredients;
+	private Set<Ingredient> ingredients;
 
-	
-	public Integer getId() {
-		return id;
+	public Float getPrice() {
+		return price;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setPrice(Float price) {
+		this.price = price;
 	}
 
-	public Float getPrix() {
-		return prix;
-	}
-
-	public void setPrix(Float prix) {
-		this.prix = prix;
-	}
-
-	public List<Ingredient> getIngredients() {
+	public Set<Ingredient> getIngredients() {
 		return ingredients;
 	}
 
-	public void setIngredients(List<Ingredient> ingredients) {
+	public void setIngredients(Set<Ingredient> ingredients) {
 		this.ingredients = ingredients;
 	}
+
+	
+	
 	
 	
 	

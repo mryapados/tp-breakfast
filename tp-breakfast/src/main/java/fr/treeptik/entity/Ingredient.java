@@ -1,7 +1,7 @@
 package fr.treeptik.entity;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,8 +34,8 @@ public class Ingredient implements Serializable {
 	@Enumerated(EnumType.STRING)
 	breakfastType type;
 	
-	@ManyToMany(mappedBy = "teams")
-	private List<Breakfast> breakfasts;
+	@ManyToMany(mappedBy = "ingredients")
+	private Set<Breakfast> breakfasts;
 
 	public Integer getId() {
 		return id;
@@ -61,11 +61,11 @@ public class Ingredient implements Serializable {
 		this.type = type;
 	}
 
-	public List<Breakfast> getBreakfasts() {
+	public Set<Breakfast> getBreakfasts() {
 		return breakfasts;
 	}
 
-	public void setBreakfasts(List<Breakfast> breakfasts) {
+	public void setBreakfasts(Set<Breakfast> breakfasts) {
 		this.breakfasts = breakfasts;
 	}
 	

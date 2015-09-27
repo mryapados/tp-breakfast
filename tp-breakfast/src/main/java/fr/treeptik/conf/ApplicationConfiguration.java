@@ -32,8 +32,11 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 import org.springframework.web.servlet.view.UrlBasedViewResolver;
 
+import fr.treeptik.exception.ServiceException;
+
 @Configuration
 @ComponentScan(basePackages = "fr.treeptik")
+@Import({ SecurityConfiguration.class })
 @EnableWebMvc
 @PropertySource(value = "classpath:config.properties", name = "config")
 @EnableTransactionManagement
@@ -90,11 +93,6 @@ public class ApplicationConfiguration extends WebMvcConfigurerAdapter{
 		jpaTransactionManager.setEntityManagerFactory(entityManagerFactory());
 		return jpaTransactionManager;
 	}
-
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/style/**").addResourceLocations("/style/");
-	}
 	
 	@Bean
 	public UrlBasedViewResolver urlBasedViewResolver() {
@@ -105,6 +103,11 @@ public class ApplicationConfiguration extends WebMvcConfigurerAdapter{
 		return res;
 	}
 
+	@Override
+	public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/style/**").addResourceLocations("/style/");
+	}
+	
 	@Component
 	public static class StartupListener implements ApplicationListener<ContextRefreshedEvent> {
 
@@ -122,7 +125,12 @@ public class ApplicationConfiguration extends WebMvcConfigurerAdapter{
 			System.out.println("Passage n°" + count);
 			if (count == 1 ){ 
 				System.out.println("INIT");
-				initialisationBase.run();
+				try {
+					initialisationBase.run();
+				} catch (ServiceException e) {
+					
+					e.printStackTrace();
+				}
 			}
 		}
 
