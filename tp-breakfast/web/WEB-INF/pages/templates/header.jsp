@@ -12,7 +12,7 @@
 <meta name="author" content="Cédric Sevestre">
 <link rel="icon" href="../../favicon.ico">
 
-<title>${action}</title>
+<title>${title}</title>
 
 <!-- Bootstrap core CSS -->
 <link href="../../style/bootstrap-3.3.5-dist/css/bootstrap.min.css" rel="stylesheet">

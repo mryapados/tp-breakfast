@@ -5,6 +5,8 @@ import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -19,6 +21,10 @@ public class Member extends User {
 	
 	@Column(name = "last_name")
 	String lastName;
+	
+	@Column(name = "preference")
+	@Enumerated(EnumType.STRING)
+	Ingredient.BreakfastType preference;
 	
 	@OneToMany(mappedBy = "organizer")
 	private Set<Event> events;
@@ -56,6 +62,14 @@ public class Member extends User {
 
 	public void setDiaries(Set<Diary> diaries) {
 		this.diaries = diaries;
+	}
+
+	public Ingredient.BreakfastType getPreference() {
+		return preference;
+	}
+
+	public void setPreference(Ingredient.BreakfastType preference) {
+		this.preference = preference;
 	}
 	
 	

@@ -4,7 +4,7 @@ import fr.treeptik.entity.User;
 
 public class UserToMaker {
 
-	public static UserMaker To(User user){
+	public static UserMaker to(User user){
 		UserMaker userMaker = new UserMaker();
 		
 		userMaker.setId(user.getId());

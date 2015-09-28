@@ -3,7 +3,7 @@ package fr.treeptik.exception;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class MessageErrorException extends Exception {
+public class MessageErrorException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 

@@ -2,17 +2,25 @@ package fr.treeptik.maker;
 
 import java.io.Serializable;
 
-public class UserMaker implements Serializable {
+import fr.treeptik.entity.Ingredient;
+
+public class MemberMaker implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	//User
 	private Integer id;
 	private String login;
 	private String password;
 	private String passwordMatch;
-
 	private Boolean enabled;
 	private String role;
+	//Member
+	private String firstName;
+	private String lastName;
+	private Ingredient.BreakfastType preference;
+	
+	
 	public Integer getId() {
 		return id;
 	}
@@ -49,6 +57,26 @@ public class UserMaker implements Serializable {
 	public void setRole(String role) {
 		this.role = role;
 	}
+	public String getFirstName() {
+		return firstName;
+	}
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+	public String getLastName() {
+		return lastName;
+	}
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+	public Ingredient.BreakfastType getPreference() {
+		return preference;
+	}
+	public void setPreference(Ingredient.BreakfastType preference) {
+		this.preference = preference;
+	}
+	
+	
 
 	
 

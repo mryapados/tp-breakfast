@@ -19,7 +19,7 @@ public class Ingredient implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
-	public enum breakfastType{
+	public enum BreakfastType{
 		SWEET, SALTED
 	}
 	
@@ -32,7 +32,7 @@ public class Ingredient implements Serializable {
 	
 	@Column
 	@Enumerated(EnumType.STRING)
-	breakfastType type;
+	BreakfastType type;
 	
 	@ManyToMany(mappedBy = "ingredients")
 	private Set<Breakfast> breakfasts;
@@ -53,11 +53,11 @@ public class Ingredient implements Serializable {
 		this.name = name;
 	}
 
-	public breakfastType getType() {
+	public BreakfastType getType() {
 		return type;
 	}
 
-	public void setType(breakfastType type) {
+	public void setType(BreakfastType type) {
 		this.type = type;
 	}
 

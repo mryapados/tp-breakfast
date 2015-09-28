@@ -1,42 +1,45 @@
 package fr.treeptik.controller;
 
-import java.util.Map.Entry;
+import java.beans.PropertyEditorSupport;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import fr.treeptik.entity.Ingredient;
+import fr.treeptik.entity.Member;
 import fr.treeptik.exception.FormException;
-import fr.treeptik.exception.ServiceException;
 import fr.treeptik.exception.FormException.FormExceptionFeedBack;
+import fr.treeptik.exception.MessageErrorException;
 import fr.treeptik.exception.PasswordException;
-import fr.treeptik.maker.UserMaker;
-import fr.treeptik.maker.UserToMaker;
-import fr.treeptik.entity.User;
-import fr.treeptik.service.UserService;
+import fr.treeptik.exception.ServiceException;
+import fr.treeptik.maker.MemberMaker;
+import fr.treeptik.maker.MemberToMaker;
+import fr.treeptik.service.MemberService;
 
-// Classe MemberController remplace UserController
-@Deprecated
 @Controller
-@RequestMapping(value = "/admin/user")
-public class UserController {
+@RequestMapping(value = "/admin/member")
+public class MemberController {
 
 	@Autowired
-	private UserService userService;
+	private MemberService memberService;
 
 	@RequestMapping(value = "/new.html", method = RequestMethod.GET)
 	public ModelAndView add() {
-		ModelAndView modelAndView = new ModelAndView("/admin/user/user");
-		modelAndView.addObject("userMaker", new UserMaker());
-		modelAndView.addObject("action", "Ajouter");
+		ModelAndView modelAndView = new ModelAndView("/admin/member/member");
+		modelAndView.addObject("memberMaker", new MemberMaker());
+		modelAndView.addObject("title", "Ajouter un membre");
 
 		return modelAndView;
 	}
@@ -44,12 +47,12 @@ public class UserController {
 	@RequestMapping(value = "/edit.html", method = RequestMethod.GET)
 	public ModelAndView edit(@ModelAttribute("id") Integer id) {
 		try {
-			ModelAndView modelAndView = new ModelAndView("/admin/user/user");
-			User user = userService.findById(id);
+			ModelAndView modelAndView = new ModelAndView("/admin/member/member");
+			Member member = memberService.findById(id);
 
-			UserMaker userMaker = UserToMaker.to(user);
+			MemberMaker memberMaker = MemberToMaker.to(member);
 
-			modelAndView.addObject("userMaker", userMaker);
+			modelAndView.addObject("memberMaker", memberMaker);
 			modelAndView.addObject("action", "Editer");
 			return modelAndView;
 		} catch (Exception e) {
@@ -59,9 +62,27 @@ public class UserController {
 
 	@RequestMapping(value = "/list.html", method = RequestMethod.GET)
 	public ModelAndView list() {
-		ModelAndView modelAndView = new ModelAndView("/admin/user/list-user");
+		ModelAndView modelAndView = new ModelAndView("/admin/member/members");
+
+		modelAndView.addObject("title", "Liste des membres");
+		
 		try {
-			modelAndView.addObject("users", userService.findAll());
+			List<Member> members = memberService.findAll();
+			
+			modelAndView.addObject("members", members);
+		
+			
+		} catch (ServiceException e) {
+			List<String> errors = new ArrayList<>();
+			errors.add(e.getMessage());
+			modelAndView.addObject("errors", errors);
+		}
+		
+		
+		
+		
+		try {
+			modelAndView.addObject("members", memberService.findAll());
 		} catch (Exception e) {
 			modelAndView.addObject("error", e.getMessage());
 		}
@@ -97,12 +118,15 @@ public class UserController {
 		if (errors.size() > 0) throw new PasswordException("Erreur", errors);
 	}
 	
-	private void checkUser(UserMaker userMaker) throws FormException{
-		String login = userMaker.getLogin();
-		String password = userMaker.getPassword();
-		String passwordMatch = userMaker.getPasswordMatch();
-		Boolean enabled = userMaker.getEnabled();
-		String role = userMaker.getRole();
+	private void checkMember(MemberMaker memberMaker) throws FormException{
+		String login = memberMaker.getLogin();
+		String password = memberMaker.getPassword();
+		String passwordMatch = memberMaker.getPasswordMatch();
+		Boolean enabled = memberMaker.getEnabled();
+		String role = memberMaker.getRole();
+		String firstName = memberMaker.getFirstName();
+		String lastName = memberMaker.getLastName();
+		Ingredient.BreakfastType preference = memberMaker.getPreference();
 		
 		List<String> errors = new ArrayList<>();
 		Map<String, FormExceptionFeedBack> feedBacks = new HashMap<>();
@@ -137,44 +161,55 @@ public class UserController {
 			feedBacks.put("Password", FormExceptionFeedBack.ERROR);
 			feedBacks.put("PasswordMatch", FormExceptionFeedBack.ERROR);
 		}
-		if (errors.size() > 0) throw new FormException("Erreur sauvegarde utilisateur", feedBacks, errors);
+		
+		if (firstName == null || firstName == "") {
+			errors.add("Le prénom est obligatoires.");
+			feedBacks.put("FirstName", FormExceptionFeedBack.ERROR);
+		}
+		if (lastName == null || lastName == "") {
+			errors.add("Le nom est obligatoires.");
+			feedBacks.put("LastName", FormExceptionFeedBack.ERROR);
+		}
+		if (errors.size() > 0) throw new FormException("Erreur sauvegarde membre", feedBacks, errors);
 	}
 	
 	@RequestMapping(value = "/save.html", method = RequestMethod.POST)
-	public ModelAndView save(UserMaker userMaker) {
+	public ModelAndView save(MemberMaker memberMaker) {
 		try {
 			try {
-				checkUser(userMaker);
+				checkMember(memberMaker);
 				
-				User user = null;
-				if (userMaker.getId() == null) user = new User();
-				else user = userService.findById(userMaker.getId());
+				Member member = null;
+				if (memberMaker.getId() == null) member = new Member();
+				else member = memberService.findById(memberMaker.getId());
 				
-				user.setId(userMaker.getId());
-				user.setLogin(userMaker.getLogin());
+				member.setId(memberMaker.getId());
+				member.setLogin(memberMaker.getLogin());
 				
 				String encryptPassword = "";
 				ShaPasswordEncoder sha = new ShaPasswordEncoder();
-				encryptPassword = sha.encodePassword(userMaker.getPassword(), null);
+				encryptPassword = sha.encodePassword(memberMaker.getPassword(), null);
 				
-				user.setEncryptPassword(encryptPassword);
-				user.setEnabled(userMaker.getEnabled());
-				user.setRole(userMaker.getRole());
+				member.setEncryptPassword(encryptPassword);
+				member.setEnabled(memberMaker.getEnabled());
+				member.setRole(memberMaker.getRole());
 				
-				userService.save(user);
+				member.setPreference(memberMaker.getPreference());
+				
+				memberService.save(member);
 				
 				ModelAndView modelAndView = new ModelAndView("redirect:list.html");
 				return modelAndView;
 				
 			} catch (FormException e) {
 
-				ModelAndView modelAndView = new ModelAndView("/admin/user/user");
+				ModelAndView modelAndView = new ModelAndView("/admin/member/member");
 				
-				userMaker.setPassword("");
-				userMaker.setPasswordMatch("");
+				memberMaker.setPassword("");
+				memberMaker.setPasswordMatch("");
 				
-				modelAndView.addObject("userMaker", userMaker);
-				modelAndView.addObject("action", "Ajouter");
+				modelAndView.addObject("memberMaker", memberMaker);
+				modelAndView.addObject("title", "Ajouter un membre");
 				modelAndView.addObject("errors", e.getErrors());
 				
 				for(Entry<String, FormExceptionFeedBack> entry : e.getFeedBacks().entrySet()) {
@@ -184,7 +219,7 @@ public class UserController {
 			}
 			
 		} catch (Exception e) {
-			ModelAndView modelAndView = edit(userMaker.getId());
+			ModelAndView modelAndView = edit(memberMaker.getId());
 			modelAndView.addObject("error", e.getMessage());
 			return modelAndView;
 		}
@@ -194,7 +229,7 @@ public class UserController {
 	@RequestMapping(value = "/delete.html", method = RequestMethod.GET)
 	public ModelAndView delete(@ModelAttribute("id") Integer id) {
 		try {
-			userService.remove(userService.findById(id));
+			memberService.remove(memberService.findById(id));
 			ModelAndView modelAndView = new ModelAndView("redirect:list.html");
 			return modelAndView;
 		} catch (Exception e) {
@@ -202,8 +237,23 @@ public class UserController {
 			modelAndView.addObject("error", "Impossible de supprimer l'élément.");
 			return modelAndView;
 		}
-
 	}
 	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) throws Exception {
+		binder.registerCustomEditor(Ingredient.BreakfastType.class, new PropertyEditorSupport() {
+		    @Override 
+		    public void setAsText(final String text) throws IllegalArgumentException
+		    {
+		    	if(text == null || text == "") setValue(null);
+		    	else setValue(Ingredient.BreakfastType.valueOf(text));
+		    }
+		    @Override
+		    public String getAsText() {
+			    if(getValue() == null) return "";
+			    return ((Ingredient.BreakfastType) getValue()).name();
+		    }
+		});
+	}
 
 }
