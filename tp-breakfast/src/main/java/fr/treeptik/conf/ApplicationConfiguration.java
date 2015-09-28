@@ -106,6 +106,7 @@ public class ApplicationConfiguration extends WebMvcConfigurerAdapter{
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		registry.addResourceHandler("/style/**").addResourceLocations("/style/");
+		registry.addResourceHandler("/js/**").addResourceLocations("/js/");
 	}
 	
 	@Component
