@@ -1,5 +1,6 @@
 package fr.treeptik.entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -8,6 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -17,7 +19,7 @@ public class Breakfast extends Event {
 	private static final long serialVersionUID = 1L;
 	
 	@Column
-	private Float price;
+	String name;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(
@@ -30,23 +32,24 @@ public class Breakfast extends Event {
 			referencedColumnName = "id")})
 	private Set<Ingredient> ingredients;
 
-	public Float getPrice() {
-		return price;
+	public String getName() {
+		return name;
 	}
 
-	public void setPrice(Float price) {
-		this.price = price;
+	public void setName(String name) {
+		this.name = name;
 	}
-
+	
 	public Set<Ingredient> getIngredients() {
-		return ingredients;
+		if (this.ingredients == null) this.ingredients = new HashSet<>(); 
+		return this.ingredients;
 	}
 
 	public void setIngredients(Set<Ingredient> ingredients) {
 		this.ingredients = ingredients;
 	}
 
-	
+
 	
 	
 	

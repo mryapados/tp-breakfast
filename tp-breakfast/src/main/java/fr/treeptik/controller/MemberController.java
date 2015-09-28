@@ -115,7 +115,6 @@ public class MemberController {
 		String role = memberMaker.getRole();
 		String firstName = memberMaker.getFirstName();
 		String lastName = memberMaker.getLastName();
-		Ingredient.BreakfastType preference = memberMaker.getPreference();
 		
 		List<String> errors = new ArrayList<>();
 		Map<String, FormExceptionFeedBack> feedBacks = new HashMap<>();

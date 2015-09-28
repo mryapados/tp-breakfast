@@ -15,7 +15,7 @@
 			</c:forEach>
 		</ul>
 	</c:if>
-	<form:form action="save.html" commandName="ingredient" method="POST" class="form-horizontal">
+	<form:form action="save.html" commandName="breakfast" method="POST" class="form-horizontal">
 		<form:hidden path="id" />
 
 		<div class="form-group<c:if test="${not empty fbName}"> ${fbName}</c:if>">
@@ -26,14 +26,9 @@
 		</div>
 		
 		<div class="form-group">
-			<label class="control-label col-sm-2" for="type">Type : </label>
-			<div class="col-sm-10">
-				<form:select id="type" class="form-control" path="type">
-					<form:option value="">Selectionner un type</form:option>
-					<form:option value="SWEET">Sucré</form:option>
-					<form:option value="SALTED">Salé</form:option>
-					<form:option value="BOTH">Sucré / salé</form:option>
-				</form:select>
+			<label class="control-label col-sm-2" for="login">Ingrédients :</label>
+			<div class="col-sm-10 checkboxes-block">
+				<form:checkboxes items="${ingredients}" itemValue="id" itemLabel="name" path="ingredients" />
 			</div>
 		</div>
 

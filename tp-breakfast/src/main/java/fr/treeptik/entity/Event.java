@@ -31,6 +31,9 @@ public class Event implements Serializable {
 	Date date;
 	
 	@Column
+	private Float price;
+	
+	@Column
 	String comment;
 	
 	@ManyToOne
@@ -78,6 +81,14 @@ public class Event implements Serializable {
 
 	public void setDiaries(Set<Diary> diaries) {
 		this.diaries = diaries;
+	}
+
+	public Float getPrice() {
+		return price;
+	}
+
+	public void setPrice(Float price) {
+		this.price = price;
 	}
 
 	

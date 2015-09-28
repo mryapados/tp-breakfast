@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import fr.treeptik.entity.Breakfast;
 import fr.treeptik.entity.Ingredient;
 import fr.treeptik.entity.Member;
 import fr.treeptik.entity.User;
 import fr.treeptik.exception.ServiceException;
+import fr.treeptik.service.BreakfastService;
 import fr.treeptik.service.IngredientService;
 import fr.treeptik.service.UserService;
 
@@ -22,11 +24,14 @@ public class InitialisationBase {
 	private UserService userService;
 	@Autowired
 	private IngredientService ingredientService;
+	@Autowired
+	private BreakfastService breakfastService;
 	
 	public void run() throws ServiceException {
 		System.out.println("init");
 		initUsers();
 		initIngredients();
+		initBreakfasts();
 	}
 
 	public void initUsers() throws ServiceException{
@@ -65,11 +70,6 @@ public class InitialisationBase {
 		ingredient.setName("Tranches de pain de mie");
 		ingredient.setType(Ingredient.BreakfastType.BOTH);
 		ingredientService.save(ingredient);
-
-		ingredient = new Ingredient();
-		ingredient.setName("Pain");
-		ingredient.setType(Ingredient.BreakfastType.BOTH);
-		ingredientService.save(ingredient);
 		
 		ingredient = new Ingredient();
 		ingredient.setName("Beurre");
@@ -85,19 +85,41 @@ public class InitialisationBase {
 		ingredient.setName("Confiture de fraise");
 		ingredient.setType(Ingredient.BreakfastType.SWEET);
 		ingredientService.save(ingredient);
-		
-		ingredient = new Ingredient();
-		ingredient.setName("Confiture de myrtille");
-		ingredient.setType(Ingredient.BreakfastType.SWEET);
-		ingredientService.save(ingredient);
-		
+
 		ingredient = new Ingredient();
 		ingredient.setName("Café");
 		ingredient.setType(Ingredient.BreakfastType.BOTH);
 		ingredientService.save(ingredient);
 	}
 	
-	
+	public void initBreakfasts() throws ServiceException{
+		System.out.println("init breakfasts");
+		Breakfast breakfast = new Breakfast();
+		breakfast.setName("Pain à la confiture de myrtille");
+		
+		Ingredient ingredient = new Ingredient();
+		ingredient.setName("Pain");
+		ingredient.setType(Ingredient.BreakfastType.BOTH);
+		ingredientService.save(ingredient);
+		breakfast.getIngredients().add(ingredient);
+		
+		ingredient = new Ingredient();
+		ingredient.setName("Confiture de myrtille");
+		ingredient.setType(Ingredient.BreakfastType.SWEET);
+		ingredientService.save(ingredient);
+		breakfast.getIngredients().add(ingredient);
+		
+		breakfastService.save(breakfast);
+		
+		
+		
+
+		
+		
+		
+		
+		
+	}
 	
 	
 
