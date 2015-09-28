@@ -35,7 +35,7 @@ public class Event implements Serializable {
 	
 	@ManyToOne
 	@JoinColumn(name="idorganizer")
-	private Member organizer;
+	private User organizer;
 	
 	@OneToMany(mappedBy = "event")
 	private Set<Diary> diaries;
@@ -64,11 +64,11 @@ public class Event implements Serializable {
 		this.comment = comment;
 	}
 
-	public Member getOrganizer() {
+	public User getOrganizer() {
 		return organizer;
 	}
 
-	public void setOrganizer(Member organizer) {
+	public void setOrganizer(User organizer) {
 		this.organizer = organizer;
 	}
 

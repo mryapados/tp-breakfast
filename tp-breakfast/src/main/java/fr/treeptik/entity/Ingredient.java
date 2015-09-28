@@ -20,7 +20,7 @@ public class Ingredient implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	public enum BreakfastType{
-		SWEET, SALTED
+		SWEET, SALTED, BOTH
 	}
 	
 	@Id

@@ -18,6 +18,7 @@
 			</c:forEach>
 		</ul>
 	</c:if>
+	
 	<form:form action="save.html" commandName="memberMaker" method="POST" class="form-horizontal">
 		<form:hidden path="id" />
 

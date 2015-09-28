@@ -40,20 +40,17 @@ public class MemberController {
 		ModelAndView modelAndView = new ModelAndView("/admin/member/member");
 		modelAndView.addObject("memberMaker", new MemberMaker());
 		modelAndView.addObject("title", "Ajouter un membre");
-
 		return modelAndView;
 	}
 
 	@RequestMapping(value = "/edit.html", method = RequestMethod.GET)
 	public ModelAndView edit(@ModelAttribute("id") Integer id) {
 		try {
+			
 			ModelAndView modelAndView = new ModelAndView("/admin/member/member");
-			Member member = memberService.findById(id);
+			modelAndView.addObject("title", "Editer un membre");
+			modelAndView.addObject("memberMaker", MemberToMaker.to(memberService.findById(id)));
 
-			MemberMaker memberMaker = MemberToMaker.to(member);
-
-			modelAndView.addObject("memberMaker", memberMaker);
-			modelAndView.addObject("action", "Editer");
 			return modelAndView;
 		} catch (Exception e) {
 			return list();
@@ -68,24 +65,16 @@ public class MemberController {
 		
 		try {
 			List<Member> members = memberService.findAll();
-			
 			modelAndView.addObject("members", members);
 		
 			
 		} catch (ServiceException e) {
+			e.printStackTrace();
 			List<String> errors = new ArrayList<>();
 			errors.add(e.getMessage());
 			modelAndView.addObject("errors", errors);
 		}
 		
-		
-		
-		
-		try {
-			modelAndView.addObject("members", memberService.findAll());
-		} catch (Exception e) {
-			modelAndView.addObject("error", e.getMessage());
-		}
 		return modelAndView;
 
 	}
@@ -226,7 +215,7 @@ public class MemberController {
 
 	}
 	
-	@RequestMapping(value = "/delete.html", method = RequestMethod.GET)
+	@RequestMapping(value = "/del.html", method = RequestMethod.GET)
 	public ModelAndView delete(@ModelAttribute("id") Integer id) {
 		try {
 			memberService.remove(memberService.findById(id));

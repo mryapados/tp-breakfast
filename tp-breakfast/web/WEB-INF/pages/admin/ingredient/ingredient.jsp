@@ -26,12 +26,13 @@
 		</div>
 		
 		<div class="form-group">
-			<label class="control-label col-sm-2" for="preference">Préférence : </label>
+			<label class="control-label col-sm-2" for="type">Type : </label>
 			<div class="col-sm-10">
-				<form:select id="preference" class="form-control" path="preference">
-					<form:option value="">J'aime tout</form:option>
+				<form:select id="type" class="form-control" path="type">
+					<form:option value="">Selectionner un type</form:option>
 					<form:option value="SWEET">Sucré</form:option>
 					<form:option value="SALTED">Salé</form:option>
+					<form:option value="BOTH">Sucré / salé</form:option>
 				</form:select>
 			</div>
 		</div>

@@ -19,31 +19,23 @@
 		</ul>
 	</c:if>
 
-	<div><a class="btn btn-primary" href="new.html">Ajouter un membre</a></div>
+	<div><a class="btn btn-primary" href="new.html">Ajouter un ingrédient</a></div>
 
 	<table class="table table-striped">
 		<thead>
 			<tr>
-				<th>Loging</th>
-				<th>Activé</th>
-				<th>Role</th>
-				<th>Prénom</th>
 				<th>Nom</th>
-				<th>Préférence</th>
+				<th>Type</th>
 				<th>Outils</th>
 			</tr>
 		</thead>
 		<tbody>
 
-			<c:if test="${not empty members}">
-				<c:forEach items="${members}" var="value">
+			<c:if test="${not empty ingredients}">
+				<c:forEach items="${ingredients}" var="value">
 					<tr>
-						<td>${value.login}</td>
-						<td>${value.enabled}</td>
-						<td>${value.role}</td>
-						<td>${value.firstName}</td>
-						<td>${value.lastName}</td>
-						<td>${value.preference}</td>
+						<td>${value.name}</td>
+						<td>${value.type}</td>
 						<td>
 							<a class="btn btn-primary" href="edit.html?id=${value.id}">Edit</a>
 							<a class="btn btn-danger" href="del.html?id=${value.id}">Del</a>

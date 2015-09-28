@@ -28,7 +28,6 @@ public class IngredientService {
 	public Ingredient save(Ingredient ingredient) throws ServiceException {
 		logger.debug("appel de la methode save Ingredient " + ingredient.getName());
 		try {
-			ingredient.setName(ingredient.getName().toLowerCase());
 			return ingredientDao.save(ingredient);
 		} catch (PersistenceException e) {
 			logger.error("erreur save Ingredient " + e.getMessage());
