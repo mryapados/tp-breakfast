@@ -77,9 +77,10 @@ public class BreakfastService {
 			throw new ServiceException("erreur findById player", e);
 		}
 	}
-	public Set<Breakfast> findByIdWithIngredients(Integer id) throws ServiceException {
+	public Breakfast findByIdWithIngredients(Integer id) throws ServiceException {
 		try {
 			return breakfastDao.findByIdWithIngredients(id);
+			
 		} catch (PersistenceException e) {
 			throw new ServiceException("erreur findById player", e);
 		}

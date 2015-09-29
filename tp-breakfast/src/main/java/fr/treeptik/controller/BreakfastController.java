@@ -79,23 +79,18 @@ public class BreakfastController {
 
 	@RequestMapping(value = "/edit.html", method = RequestMethod.GET)
 	public ModelAndView edit(@ModelAttribute("id") Integer id) {
+		ModelAndView modelAndView = new ModelAndView("/admin/breakfast/breakfast");
+		
+		modelAndView.addObject("title", "Ajouter un petit déjeuné");
 		try {
-			
-			ModelAndView modelAndView = new ModelAndView("/admin/breakfast/breakfast");
-			modelAndView.addObject("title", "Editer un membre");
+			modelAndView.addObject("ingredientsCache", initCache());
 			modelAndView.addObject("breakfast", breakfastService.findByIdWithIngredients(id));
-			try {
-				modelAndView.addObject("ingredientsCache", initCache());
-			} catch (ServiceException e) {
-				// TODO gestion correct
-				return list();
-			}
-			
-			return modelAndView;
-		} catch (Exception e) {
+		} catch (ServiceException e) {
 			// TODO gestion correct
 			return list();
 		}
+
+		return modelAndView;
 	}
 
 	@RequestMapping(value = "/list.html", method = RequestMethod.GET)
