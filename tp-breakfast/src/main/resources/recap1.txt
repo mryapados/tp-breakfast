@@ -27,11 +27,8 @@ II - A Problème rencontré
 	Problème résolu grâce aux InitBinder
 
 II - B Problème non résolues
-
-	1) je ne parviens pas encore à préremplir mon "<form:checkboxes />" lorsque que la méthode save reviens sur le formulaire en cas d'erreur (nom manquant) ou bien pour l'édition.
-	manipuler http://localhost:8080/tp-breakfast/admin/breakfast/new.html pour voir.
 	
-	2) Problème d'encodage dans les transactions -> chaines contenant caractère spéciaux éàç...
+	1) Problème d'encodage dans les transactions -> chaines contenant caractère spéciaux éàç...
 
 
 III - Ce que je souhaite montrer

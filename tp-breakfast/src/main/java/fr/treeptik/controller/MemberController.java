@@ -186,6 +186,7 @@ public class MemberController {
 				
 				memberService.save(member);
 				
+				
 				ModelAndView modelAndView = new ModelAndView("redirect:list.html");
 				return modelAndView;
 				

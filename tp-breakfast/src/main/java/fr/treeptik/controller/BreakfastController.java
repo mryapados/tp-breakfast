@@ -1,16 +1,24 @@
 package fr.treeptik.controller;
 
 import java.beans.PropertyEditorSupport;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomCollectionEditor;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -49,14 +57,23 @@ public class BreakfastController {
 	@RequestMapping(value = "/new.html", method = RequestMethod.GET)
 	public ModelAndView add() {
 		ModelAndView modelAndView = new ModelAndView("/admin/breakfast/breakfast");
-		modelAndView.addObject("breakfast", new Breakfast());
+		
 		modelAndView.addObject("title", "Ajouter un petit déjeuné");
 		try {
-			modelAndView.addObject("ingredients", initCache());
+			modelAndView.addObject("ingredientsCache", initCache());
 		} catch (ServiceException e) {
 			// TODO gestion correct
 			return list();
 		}
+		
+		GregorianCalendar calendar = new java.util.GregorianCalendar(); 
+		calendar.add(Calendar.DATE, 7);
+	
+		Breakfast defaultBreakfast = new Breakfast();
+		defaultBreakfast.setDate(calendar.getTime());
+		
+		modelAndView.addObject("breakfast", defaultBreakfast);
+
 		return modelAndView;
 	}
 
@@ -68,7 +85,7 @@ public class BreakfastController {
 			modelAndView.addObject("title", "Editer un membre");
 			modelAndView.addObject("breakfast", breakfastService.findByIdWithIngredients(id));
 			try {
-				modelAndView.addObject("ingredients", initCache());
+				modelAndView.addObject("ingredientsCache", initCache());
 			} catch (ServiceException e) {
 				// TODO gestion correct
 				return list();
@@ -105,18 +122,27 @@ public class BreakfastController {
 
 
 	private void checkBreakfast(Breakfast breakfast) throws FormException{
+		Date date = breakfast.getDate();
 		String name = breakfast.getName();
+		String commentaire = breakfast.getComment();
 		List<String> errors = new ArrayList<>();
 		Map<String, FormExceptionFeedBack> feedBacks = new HashMap<>();
+		if (date == null) {
+			errors.add("La date de l'évènement est obligatoire.");
+			feedBacks.put("Date", FormExceptionFeedBack.ERROR);
+		}
 		if (name == null || name == "") {
-			errors.add("Le nom est obligatoires.");
+			errors.add("Le nom est obligatoire.");
 			feedBacks.put("Name", FormExceptionFeedBack.ERROR);
+		}
+		if (commentaire == null || commentaire == "") {
+			feedBacks.put("Comment", FormExceptionFeedBack.WARNING);
 		}
 		if (errors.size() > 0) throw new FormException("Erreur sauvegarde membre", feedBacks, errors);
 	}
 	
 	@RequestMapping(value = "/save.html", method = RequestMethod.POST)
-	public ModelAndView save(Breakfast breakfast) {
+	public ModelAndView save(@Valid @ModelAttribute("breakfast") Breakfast breakfast, BindingResult result){
 		System.out.println("save");
 		try {
 			try {
@@ -140,7 +166,7 @@ public class BreakfastController {
 				}
 				
 				try {
-					modelAndView.addObject("ingredients", initCache());
+					modelAndView.addObject("ingredientsCache", initCache());
 				} catch (ServiceException e1) {
 					// TODO gestion correct
 					return list();
@@ -172,6 +198,7 @@ public class BreakfastController {
 	
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) throws Exception {
+		System.out.println("initBinder");
 		binder.registerCustomEditor(Ingredient.class, new PropertyEditorSupport() {
 		    @Override 
 		    public void setAsText(final String text) throws IllegalArgumentException
@@ -183,14 +210,20 @@ public class BreakfastController {
 		    }
 		    @Override
 		    public String getAsText() {
-		    	//System.out.println("getAsText" + ((Ingredient) getValue()).getName());
+		    	System.out.println("getAsText" + ((Ingredient) getValue()).getName());
 			    if(getValue() == null) return "";
-			    return ((Ingredient) getValue()).getId().toString();
+			    return "1";//((Ingredient) getValue()).getId().toString();
 		    }
 		});
 	}
 
-	
+	@InitBinder
+	protected void initBinderDate(WebDataBinder binder) {
+		System.out.println("initBinderDate");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		dateFormat.setLenient(false);
+		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+	}
 	
 	
 }

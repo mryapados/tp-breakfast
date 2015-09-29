@@ -1,5 +1,7 @@
 package fr.treeptik.conf;
 
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -95,6 +97,7 @@ public class InitialisationBase {
 	public void initBreakfasts() throws ServiceException{
 		System.out.println("init breakfasts");
 		Breakfast breakfast = new Breakfast();
+		breakfast.setDate(new Date());
 		breakfast.setName("Pain à la confiture de myrtille");
 		
 		Ingredient ingredient = new Ingredient();

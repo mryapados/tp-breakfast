@@ -18,22 +18,11 @@ public class Outside extends Event {
 	}
 	
 	@Column
-	private Float price;
-	
-	@Column
 	@Enumerated(EnumType.STRING)
 	private OutType type;
 
 	@Embedded
 	private Address adress;
-
-	public Float getPrice() {
-		return price;
-	}
-
-	public void setPrice(Float price) {
-		this.price = price;
-	}
 
 	public OutType getType() {
 		return type;

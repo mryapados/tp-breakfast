@@ -11,6 +11,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "breakfast")
@@ -18,6 +19,7 @@ public class Breakfast extends Event {
 
 	private static final long serialVersionUID = 1L;
 	
+	@NotNull
 	@Column
 	String name;
 	
