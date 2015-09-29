@@ -16,7 +16,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -28,6 +28,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import fr.treeptik.entity.Breakfast;
 import fr.treeptik.entity.Ingredient;
+import fr.treeptik.entity.User;
+import fr.treeptik.entity.dto.BreakfastDto;
 import fr.treeptik.exception.FormException;
 import fr.treeptik.exception.FormException.FormExceptionFeedBack;
 import fr.treeptik.exception.ServiceException;
@@ -45,6 +47,12 @@ public class BreakfastController {
 	private IngredientService ingredientService;
 	@Autowired
 	private UserService userService;
+		
+	private User user;
+	private void initUser() throws ServiceException{
+		org.springframework.security.core.userdetails.User userDetail = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		user = userService.findByLogin(userDetail.getUsername());
+	}
 	
 	private Map<String, Ingredient> ingredientsCache;
 	private List<Ingredient> initCache() throws ServiceException{
@@ -63,6 +71,7 @@ public class BreakfastController {
 		
 		modelAndView.addObject("title", "Ajouter un petit déjeuné");
 		try {
+			initUser();
 			modelAndView.addObject("ingredientsCache", initCache());
 		} catch (ServiceException e) {
 			// TODO gestion correct
@@ -86,6 +95,7 @@ public class BreakfastController {
 		
 		modelAndView.addObject("title", "Ajouter un petit déjeuné");
 		try {
+			initUser();
 			modelAndView.addObject("ingredientsCache", initCache());
 			modelAndView.addObject("breakfast", breakfastService.findByIdWithIngredients(id));
 		} catch (ServiceException e) {
@@ -98,15 +108,31 @@ public class BreakfastController {
 
 	@RequestMapping(value = "/list.html", method = RequestMethod.GET)
 	public ModelAndView list() {
+		
+		
 		ModelAndView modelAndView = new ModelAndView("/admin/breakfast/breakfasts");
 
 		modelAndView.addObject("title", "Liste des petit déjeunés");
 		
 		try {
+			initUser();
 			List<Breakfast> breakfasts = breakfastService.findAllWithIngredients();
-			modelAndView.addObject("breakfasts", breakfasts);
-		
-			
+			List<BreakfastDto> breakfastDtos = new ArrayList<>();
+			for (Breakfast breakfast : breakfasts) {
+				BreakfastDto breakfastDto = BreakfastDto.from(breakfast);
+				
+				if (user.getRole().equals(User.ROLE_ADMIN) || user.getId() == breakfast.getOrganizer().getId()){
+					breakfastDto.setAllowDel(true);
+					breakfastDto.setAllowEdit(true);
+				}
+				if (breakfast.getOrganizer().getId() != user.getId()){
+					breakfastDto.setAllowRegister(true);
+				}
+
+				breakfastDtos.add(breakfastDto);
+			}
+			modelAndView.addObject("breakfasts", breakfastDtos);
+
 		} catch (ServiceException e) {
 			e.printStackTrace();
 			List<String> errors = new ArrayList<>();
@@ -146,8 +172,7 @@ public class BreakfastController {
 			try {
 				checkBreakfast(breakfast);
 				
-				User userDetail = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-			    breakfast.setOrganizer(userService.findByLogin(userDetail.getUsername()));
+				breakfast.setOrganizer(user);
 				
 				breakfastService.save(breakfast);
 				

@@ -23,7 +23,7 @@ public class Breakfast extends Event {
 	
 	@NotNull
 	@Column
-	String name;
+	private String name;
 	
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(

@@ -56,7 +56,7 @@ public class InitialisationBase {
 		sha = new ShaPasswordEncoder();
 		member.setEncryptPassword(sha.encodePassword("852963", null));
 		member.setEnabled(true);
-		member.setRole("ROLE_USER");
+		member.setRole("ROLE_ADMIN");
 		member.setFirstName("Cédric");
 		member.setLastName("Sevestre");
 		member.setPreference(Ingredient.BreakfastType.SWEET);
@@ -82,11 +82,6 @@ public class InitialisationBase {
 		ingredientService.save(ingredient);
 		
 		ingredient = new Ingredient();
-		ingredient.setName("Biscottes");
-		ingredient.setType(Ingredient.BreakfastType.BOTH);
-		ingredientService.save(ingredient);
-		
-		ingredient = new Ingredient();
 		ingredient.setName("Confiture de fraise");
 		ingredient.setType(Ingredient.BreakfastType.SWEET);
 		ingredientService.save(ingredient);
@@ -102,6 +97,7 @@ public class InitialisationBase {
 		Breakfast breakfast = new Breakfast();
 		breakfast.setDate(new Date());
 		breakfast.setName("Pain à la confiture de myrtille");
+		breakfast.setComment("Venez vous régaler !");
 		breakfast.setOrganizer(userService.findByLogin("admin"));
 		
 		Ingredient ingredient = new Ingredient();
@@ -120,6 +116,26 @@ public class InitialisationBase {
 		
 		
 		
+		
+		breakfast = new Breakfast();
+		breakfast.setDate(new Date());
+		breakfast.setName("Biscottes à la confiture de groseille");
+		breakfast.setComment("Youpi !!");
+		breakfast.setOrganizer(userService.findByLogin("mryapados"));
+		
+		ingredient = new Ingredient();
+		ingredient.setName("Biscottes");
+		ingredient.setType(Ingredient.BreakfastType.BOTH);
+		ingredientService.save(ingredient);
+		breakfast.getIngredients().add(ingredient);
+		
+		ingredient = new Ingredient();
+		ingredient.setName("Confiture de groseille");
+		ingredient.setType(Ingredient.BreakfastType.SWEET);
+		ingredientService.save(ingredient);
+		breakfast.getIngredients().add(ingredient);
+		
+		breakfastService.save(breakfast);
 	}
 	
 	

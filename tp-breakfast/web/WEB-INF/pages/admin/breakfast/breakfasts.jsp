@@ -24,6 +24,7 @@
 	<table class="table table-striped">
 		<thead>
 			<tr>
+				<th>Date</th>
 				<th>Nom</th>
 				<th>Ingrédients</th>
 				<th>Commentaire</th>
@@ -36,6 +37,7 @@
 			<c:if test="${not empty breakfasts}">
 				<c:forEach items="${breakfasts}" var="value">
 					<tr>
+						<td>${value.date}</td>
 						<td>${value.name}</td>
 						<td>
 							<c:if test="${not empty value.ingredients}">
@@ -49,8 +51,15 @@
 						<td>${value.comment}</td>
 						<td>${value.organizer.name}</td>
 						<td>
-							<a class="btn btn-primary" href="edit.html?id=${value.id}">Edit</a>
-							<a class="btn btn-danger" href="del.html?id=${value.id}">Del</a>
+							<c:if test="${value.allowEdit}">
+								<a class="btn btn-primary" href="edit.html?id=${value.id}">Edit</a>
+							</c:if>
+							<c:if test="${value.allowDel}">
+								<a class="btn btn-danger" href="del.html?id=${value.id}">Suppr</a>
+							</c:if>
+							<c:if test="${value.allowRegister}">
+								<a class="btn btn-success" href="reg.html?id=${value.id}">S'inscrire</a>
+							</c:if>
 						</td>
 					</tr>
 				</c:forEach>

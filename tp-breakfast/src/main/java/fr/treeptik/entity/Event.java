@@ -30,13 +30,13 @@ public class Event implements Serializable {
 	
 	@NotNull
 	@Column
-	Date date;
+	private Date date;
 	
 	@Column
 	private Float price;
 	
 	@Column
-	String comment;
+	private String comment;
 	
 	@ManyToOne
 	@JoinColumn(name="idorganizer")
