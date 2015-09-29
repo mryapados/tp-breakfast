@@ -13,6 +13,7 @@ import fr.treeptik.entity.User;
 import fr.treeptik.exception.ServiceException;
 import fr.treeptik.service.BreakfastService;
 import fr.treeptik.service.IngredientService;
+import fr.treeptik.service.MemberService;
 import fr.treeptik.service.UserService;
 
 
@@ -24,6 +25,8 @@ public class InitialisationBase {
 
 	@Autowired
 	private UserService userService;
+	@Autowired
+	private MemberService memberService;
 	@Autowired
 	private IngredientService ingredientService;
 	@Autowired
@@ -46,7 +49,7 @@ public class InitialisationBase {
 		member.setRole("ROLE_ADMIN");
 		member.setFirstName("Super");
 		member.setLastName("Boss");
-		userService.save(member);
+		memberService.save(member);
 
 		member = new Member();
 		member.setLogin("mrYapados");
@@ -57,7 +60,7 @@ public class InitialisationBase {
 		member.setFirstName("Cédric");
 		member.setLastName("Sevestre");
 		member.setPreference(Ingredient.BreakfastType.SWEET);
-		userService.save(member);
+		memberService.save(member);
 		
 	}
 	
@@ -99,6 +102,7 @@ public class InitialisationBase {
 		Breakfast breakfast = new Breakfast();
 		breakfast.setDate(new Date());
 		breakfast.setName("Pain à la confiture de myrtille");
+		breakfast.setOrganizer(userService.findByLogin("admin"));
 		
 		Ingredient ingredient = new Ingredient();
 		ingredient.setName("Pain");
@@ -113,12 +117,6 @@ public class InitialisationBase {
 		breakfast.getIngredients().add(ingredient);
 		
 		breakfastService.save(breakfast);
-		
-		
-		
-
-		
-		
 		
 		
 		

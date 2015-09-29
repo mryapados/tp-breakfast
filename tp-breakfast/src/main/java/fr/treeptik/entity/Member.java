@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -32,6 +33,11 @@ public class Member extends User {
 	@OneToMany(mappedBy = "member")
 	private Set<Diary> diaries;
 
+	@Override
+	public String getName() {
+		return (firstName + " " + lastName).trim();
+	}
+	
 	public String getFirstName() {
 		return firstName;
 	}

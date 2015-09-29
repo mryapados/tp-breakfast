@@ -26,6 +26,8 @@
 			<tr>
 				<th>Nom</th>
 				<th>Ingrédients</th>
+				<th>Commentaire</th>
+				<th>Organisateur</th>
 				<th>Outils</th>
 			</tr>
 		</thead>
@@ -35,7 +37,17 @@
 				<c:forEach items="${breakfasts}" var="value">
 					<tr>
 						<td>${value.name}</td>
-						<td></td>
+						<td>
+							<c:if test="${not empty value.ingredients}">
+								<ul class="list-unstyled">
+									<c:forEach items="${value.ingredients}" var="ingredient">
+										<li>${ingredient.name}</li>
+									</c:forEach>
+								</ul>
+							</c:if>
+						</td>
+						<td>${value.comment}</td>
+						<td>${value.organizer.name}</td>
 						<td>
 							<a class="btn btn-primary" href="edit.html?id=${value.id}">Edit</a>
 							<a class="btn btn-danger" href="del.html?id=${value.id}">Del</a>

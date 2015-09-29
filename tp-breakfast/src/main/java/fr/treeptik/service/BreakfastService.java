@@ -94,6 +94,14 @@ public class BreakfastService {
 		}
 	}
 	
+	public List<Breakfast> findAllWithIngredients() throws ServiceException {
+		try {
+			return breakfastDao.findAllWithIngredients();
+		} catch (PersistenceException e) {
+			throw new ServiceException("erreur findAll Breakfast", e);
+		}
+	}
+	
 	public Logger getLogger() {
 		return logger;
 	}

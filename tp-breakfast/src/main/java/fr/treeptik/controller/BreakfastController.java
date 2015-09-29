@@ -10,13 +10,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomCollectionEditor;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -33,6 +33,7 @@ import fr.treeptik.exception.FormException.FormExceptionFeedBack;
 import fr.treeptik.exception.ServiceException;
 import fr.treeptik.service.BreakfastService;
 import fr.treeptik.service.IngredientService;
+import fr.treeptik.service.UserService;
 
 @Controller
 @RequestMapping(value = "/admin/breakfast")
@@ -42,6 +43,8 @@ public class BreakfastController {
 	private BreakfastService breakfastService;
 	@Autowired
 	private IngredientService ingredientService;
+	@Autowired
+	private UserService userService;
 	
 	private Map<String, Ingredient> ingredientsCache;
 	private List<Ingredient> initCache() throws ServiceException{
@@ -100,7 +103,7 @@ public class BreakfastController {
 		modelAndView.addObject("title", "Liste des petit déjeunés");
 		
 		try {
-			List<Breakfast> breakfasts = breakfastService.findAll();
+			List<Breakfast> breakfasts = breakfastService.findAllWithIngredients();
 			modelAndView.addObject("breakfasts", breakfasts);
 		
 			
@@ -142,7 +145,10 @@ public class BreakfastController {
 		try {
 			try {
 				checkBreakfast(breakfast);
-
+				
+				User userDetail = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			    breakfast.setOrganizer(userService.findByLogin(userDetail.getUsername()));
+				
 				breakfastService.save(breakfast);
 				
 				ModelAndView modelAndView = new ModelAndView("redirect:list.html");

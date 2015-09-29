@@ -44,7 +44,7 @@ public class Event implements Serializable {
 	
 	@OneToMany(mappedBy = "event")
 	private Set<Diary> diaries;
-
+	
 	public Integer getId() {
 		return id;
 	}

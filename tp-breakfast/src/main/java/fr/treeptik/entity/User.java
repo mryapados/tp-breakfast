@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 
 @Entity
@@ -19,7 +20,7 @@ import javax.persistence.Table;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "status")
 @DiscriminatorValue(value = "user")
-public class User implements Serializable {
+public abstract class User implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -39,6 +40,11 @@ public class User implements Serializable {
 	@Column(name = "role")
 	private String role;
 
+	@Transient
+	private String name;
+	
+	abstract String getName();
+	
 	public Integer getId() {
 		return id;
 	}

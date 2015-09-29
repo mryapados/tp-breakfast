@@ -83,6 +83,15 @@ public class UserService{
 			throw new ServiceException("erreur findById player", e);
 		}
 	}
+	
+	public User findByLogin(String login) throws ServiceException {
+		try {
+			return userDao.FindByLogin(login);
+		} catch (PersistenceException e) {
+			throw new ServiceException("erreur findByLogin player", e);
+		}
+	}
+	
 	public List<User> findAll() throws ServiceException {
 		try {
 			return userDao.findAll();
