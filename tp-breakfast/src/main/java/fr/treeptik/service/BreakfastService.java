@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.treeptik.dao.BreakfastDao;
 import fr.treeptik.entity.Breakfast;
+import fr.treeptik.entity.User;
 import fr.treeptik.exception.ServiceException;
 
 @Service
@@ -100,6 +101,23 @@ public class BreakfastService {
 		} catch (PersistenceException e) {
 			throw new ServiceException("erreur findAll Breakfast", e);
 		}
+	}
+	
+	public Boolean AllowAdministration(User userConnected, Breakfast breakfast){
+		System.out.println(userConnected.getLogin());
+		System.out.println(breakfast.getOrganizer().getId());
+		if (userConnected.getRole().equals(User.ROLE_ADMIN) || userConnected.getId() == breakfast.getOrganizer().getId()){
+			return true;
+		}
+		return false;
+	}
+	public Boolean AllowRegistration(User userConnected, Breakfast breakfast){
+		if (userConnected.getId() == breakfast.getOrganizer().getId()){
+			
+			System.out.println("Peut pas");
+			return false;
+		}
+		return true;
 	}
 	
 	public Logger getLogger() {

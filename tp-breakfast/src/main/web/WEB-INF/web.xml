@@ -17,8 +17,11 @@
 			<param-name>contextConfigLocation</param-name>
 			<param-value>fr.treeptik.conf.ApplicationConfiguration</param-value>
 		</init-param>
+<!-- 		<context-param> -->
+<!-- 		   <param-name>defaultHtmlEscape</param-name> -->
+<!-- 		   <param-value>true</param-value> -->
+<!-- 		</context-param> -->
 	</servlet>
-
 
 
 </web-app>

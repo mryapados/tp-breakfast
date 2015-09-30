@@ -56,7 +56,7 @@ public class InitialisationBase {
 		sha = new ShaPasswordEncoder();
 		member.setEncryptPassword(sha.encodePassword("852963", null));
 		member.setEnabled(true);
-		member.setRole("ROLE_ADMIN");
+		member.setRole("ROLE_USER");
 		member.setFirstName("Cédric");
 		member.setLastName("Sevestre");
 		member.setPreference(Ingredient.BreakfastType.SWEET);

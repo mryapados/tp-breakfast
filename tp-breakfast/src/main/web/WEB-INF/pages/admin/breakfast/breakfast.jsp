@@ -18,7 +18,8 @@
 	</c:if>
 	<form:form action="save.html" commandName="breakfast" method="POST" class="form-horizontal">
 		<form:hidden path="id" />
-
+		<form:hidden path="organizer" />
+		
 		<div class="form-group<c:if test="${not empty fbDate}"> ${fbDate}</c:if>">
 			<label class="control-label col-sm-2" for="name">Date :</label>
 			<div class="col-sm-10">

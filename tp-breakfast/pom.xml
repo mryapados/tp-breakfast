@@ -189,7 +189,7 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.6</version>
 				<configuration>
-					<warSourceDirectory>web</warSourceDirectory>
+					<warSourceDirectory>src/main/web</warSourceDirectory>
 				</configuration>
 			</plugin>
 		</plugins>

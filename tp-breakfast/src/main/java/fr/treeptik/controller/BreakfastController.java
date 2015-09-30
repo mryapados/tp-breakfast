@@ -15,8 +15,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.security.core.context.SecurityContextHolder;
-
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
@@ -26,10 +25,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import fr.treeptik.controller.checkin.BreakfastCheckin;
 import fr.treeptik.entity.Breakfast;
 import fr.treeptik.entity.Ingredient;
 import fr.treeptik.entity.User;
 import fr.treeptik.entity.dto.BreakfastDto;
+import fr.treeptik.exception.ForbiddenException;
 import fr.treeptik.exception.FormException;
 import fr.treeptik.exception.FormException.FormExceptionFeedBack;
 import fr.treeptik.exception.ServiceException;
@@ -38,8 +39,9 @@ import fr.treeptik.service.IngredientService;
 import fr.treeptik.service.UserService;
 
 @Controller
+@Scope("prototype")
 @RequestMapping(value = "/admin/breakfast")
-public class BreakfastController {
+public class BreakfastController extends AbtractController{
 
 	@Autowired
 	private BreakfastService breakfastService;
@@ -47,15 +49,12 @@ public class BreakfastController {
 	private IngredientService ingredientService;
 	@Autowired
 	private UserService userService;
-		
-	private User user;
-	private void initUser() throws ServiceException{
-		org.springframework.security.core.userdetails.User userDetail = (org.springframework.security.core.userdetails.User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		user = userService.findByLogin(userDetail.getUsername());
-	}
+	
 	
 	private Map<String, Ingredient> ingredientsCache;
-	private List<Ingredient> initCache() throws ServiceException{
+	
+	@ModelAttribute("ingredientsCache")
+	private List<Ingredient> initIngredientCache() throws ServiceException{
 		ingredientsCache = new HashMap<>();
 		List<Ingredient> ingredients;
 		ingredients = ingredientService.findAll();
@@ -65,18 +64,25 @@ public class BreakfastController {
 		return ingredients;
 	}
 	
+	private Map<String, User> usersCache;
+	
+	@ModelAttribute("usersCache")
+	private List<User> initUserCache() throws ServiceException{
+		System.out.println("initUserCache");
+		usersCache = new HashMap<>();
+		List<User> users;
+		users = userService.findAll();
+		for (User user : users) {
+			usersCache.put(user.getId().toString(), user);
+		}
+		return users;
+	}
+	
 	@RequestMapping(value = "/new.html", method = RequestMethod.GET)
 	public ModelAndView add() {
 		ModelAndView modelAndView = new ModelAndView("/admin/breakfast/breakfast");
 		
 		modelAndView.addObject("title", "Ajouter un petit déjeuné");
-		try {
-			initUser();
-			modelAndView.addObject("ingredientsCache", initCache());
-		} catch (ServiceException e) {
-			// TODO gestion correct
-			return list();
-		}
 		
 		GregorianCalendar calendar = new java.util.GregorianCalendar(); 
 		calendar.add(Calendar.DATE, 7);
@@ -95,8 +101,6 @@ public class BreakfastController {
 		
 		modelAndView.addObject("title", "Ajouter un petit déjeuné");
 		try {
-			initUser();
-			modelAndView.addObject("ingredientsCache", initCache());
 			modelAndView.addObject("breakfast", breakfastService.findByIdWithIngredients(id));
 		} catch (ServiceException e) {
 			// TODO gestion correct
@@ -112,20 +116,19 @@ public class BreakfastController {
 		
 		ModelAndView modelAndView = new ModelAndView("/admin/breakfast/breakfasts");
 
-		modelAndView.addObject("title", "Liste des petit déjeunés");
+		modelAndView.addObject("title", "Liste des petits déjeunés");
 		
 		try {
-			initUser();
 			List<Breakfast> breakfasts = breakfastService.findAllWithIngredients();
 			List<BreakfastDto> breakfastDtos = new ArrayList<>();
 			for (Breakfast breakfast : breakfasts) {
 				BreakfastDto breakfastDto = BreakfastDto.from(breakfast);
 				
-				if (user.getRole().equals(User.ROLE_ADMIN) || user.getId() == breakfast.getOrganizer().getId()){
+				if (breakfastService.AllowAdministration(getUser(), breakfast)){
 					breakfastDto.setAllowDel(true);
 					breakfastDto.setAllowEdit(true);
 				}
-				if (breakfast.getOrganizer().getId() != user.getId()){
+				if (breakfastService.AllowRegistration(getUser(), breakfast)){
 					breakfastDto.setAllowRegister(true);
 				}
 
@@ -144,35 +147,20 @@ public class BreakfastController {
 
 	}
 
-
-	private void checkBreakfast(Breakfast breakfast) throws FormException{
-		Date date = breakfast.getDate();
-		String name = breakfast.getName();
-		String commentaire = breakfast.getComment();
-		List<String> errors = new ArrayList<>();
-		Map<String, FormExceptionFeedBack> feedBacks = new HashMap<>();
-		if (date == null) {
-			errors.add("La date de l'évènement est obligatoire.");
-			feedBacks.put("Date", FormExceptionFeedBack.ERROR);
-		}
-		if (name == null || name == "") {
-			errors.add("Le nom est obligatoire.");
-			feedBacks.put("Name", FormExceptionFeedBack.ERROR);
-		}
-		if (commentaire == null || commentaire == "") {
-			feedBacks.put("Comment", FormExceptionFeedBack.WARNING);
-		}
-		if (errors.size() > 0) throw new FormException("Erreur sauvegarde membre", feedBacks, errors);
-	}
-	
 	@RequestMapping(value = "/save.html", method = RequestMethod.POST)
 	public ModelAndView save(@Valid @ModelAttribute("breakfast") Breakfast breakfast, BindingResult result){
 		System.out.println("save");
 		try {
+
+			if (!breakfastService.AllowAdministration(getUser(), breakfast)){
+				throw new ForbiddenException("Vous n'avez pas le droit d'éditer " + breakfast.getName());
+			}
+			
 			try {
-				checkBreakfast(breakfast);
+				BreakfastCheckin.checkBreakfast(breakfast);
 				
-				breakfast.setOrganizer(user);
+				
+				if (breakfast.getOrganizer() == null) breakfast.setOrganizer(getUser());
 				
 				breakfastService.save(breakfast);
 				
@@ -190,18 +178,11 @@ public class BreakfastController {
 				for(Entry<String, FormExceptionFeedBack> entry : e.getFeedBacks().entrySet()) {
 					modelAndView.addObject("fb" + entry.getKey(), "has-" + entry.getValue().toString().toLowerCase());
 				}
-				
-				try {
-					modelAndView.addObject("ingredientsCache", initCache());
-				} catch (ServiceException e1) {
-					// TODO gestion correct
-					return list();
-				}
-				
+
 				return modelAndView;
 			}
 			
-		} catch (Exception e) {
+		} catch (ServiceException e) {
 			ModelAndView modelAndView = edit(breakfast.getId());
 			modelAndView.addObject("error", e.getMessage());
 			return modelAndView;
@@ -211,21 +192,29 @@ public class BreakfastController {
 	
 	@RequestMapping(value = "/del.html", method = RequestMethod.GET)
 	public ModelAndView delete(@ModelAttribute("id") Integer id) {
+
 		try {
-			breakfastService.remove(breakfastService.findById(id));
+			Breakfast breakfast = breakfastService.findById(id);
+			if (!breakfastService.AllowAdministration(getUser(), breakfast)){
+				throw new ForbiddenException("Vous n'avez pas le droit de supprimer " + breakfast.getName());
+			}
+			
+			breakfastService.remove(breakfast);
 			ModelAndView modelAndView = new ModelAndView("redirect:list.html");
 			return modelAndView;
-		} catch (Exception e) {
-			ModelAndView modelAndView = edit(id);
-			modelAndView.addObject("error", "Impossible de supprimer l'élément.");
-			return modelAndView;
+			
+		} catch (ServiceException e) {
+			// TODO gestion correct
+			return list();
 		}
+		
+
 	}
 	
 	@InitBinder
-	protected void initBinder(WebDataBinder binder) throws Exception {
-		System.out.println("initBinder");
-		binder.registerCustomEditor(Ingredient.class, new PropertyEditorSupport() {
+	protected void initBinderIngredient(WebDataBinder binder) throws Exception {
+		System.out.println("initBinderIngredient");
+		binder.registerCustomEditor(Ingredient.class, "ingredients" , new PropertyEditorSupport() {
 		    @Override 
 		    public void setAsText(final String text) throws IllegalArgumentException
 		    {
@@ -234,21 +223,43 @@ public class BreakfastController {
 		    		setValue(ingredientsCache.get(text));
 		    	}
 		    }
+//		    @Override
+//		    public String getAsText() { // Inutile ?!
+//		    	System.out.println("getAsText" + ((Ingredient) getValue()).getName());
+//			    if(getValue() == null) return "";
+//			    return ((Ingredient) getValue()).getId().toString();
+//		    }
+		});
+	}
+	
+	
+	@InitBinder
+	protected void initBinderOrganizer(WebDataBinder binder) throws Exception {
+		System.out.println("initBinderOrganizer");
+		binder.registerCustomEditor(User.class, "organizer" , new PropertyEditorSupport() {
+		    @Override 
+		    public void setAsText(final String text) throws IllegalArgumentException
+		    {
+		    	if(text == null || text == "") setValue(null);
+		    	else {
+		    		setValue(usersCache.get(text));
+		    	}
+		    }
 		    @Override
-		    public String getAsText() {
-		    	System.out.println("getAsText" + ((Ingredient) getValue()).getName());
+		    public String getAsText() { // Inutile ?!
 			    if(getValue() == null) return "";
-			    return "1";//((Ingredient) getValue()).getId().toString();
+			    return ((User) getValue()).getId().toString();
 		    }
 		});
 	}
+	
 
 	@InitBinder
 	protected void initBinderDate(WebDataBinder binder) {
 		System.out.println("initBinderDate");
 		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 		dateFormat.setLenient(false);
-		binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
+		binder.registerCustomEditor(Date.class, "date", new CustomDateEditor(dateFormat, true));
 	}
 	
 	
