@@ -14,6 +14,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
+
 @Entity
 @Table(name = "ingredient")
 public class Ingredient implements Serializable {
@@ -28,6 +31,7 @@ public class Ingredient implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 	
+	@SafeHtml(whitelistType = WhiteListType.SIMPLE_TEXT)
 	@NotNull
 	@Column
 	String name;

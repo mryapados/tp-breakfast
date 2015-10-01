@@ -10,7 +10,7 @@ public class AbtractController {
 
 	@Autowired
 	private SessionService sessionService;
-	
+
 	private User user;
 
 	public User getUser() throws ServiceException {

@@ -12,9 +12,7 @@ import fr.treeptik.exception.ServiceException;
 
 @Component
 @Scope("session")
-public class SessionService implements Serializable{
-	
-	private static final long serialVersionUID = 1L;
+public class SessionService {
 
 	@Autowired
 	private UserService userService;

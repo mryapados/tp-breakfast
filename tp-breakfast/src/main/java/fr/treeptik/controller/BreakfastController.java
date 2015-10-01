@@ -50,9 +50,9 @@ public class BreakfastController extends AbtractController{
 	@Autowired
 	private UserService userService;
 	
+	private String title;
 	
 	private Map<String, Ingredient> ingredientsCache;
-	
 	@ModelAttribute("ingredientsCache")
 	private List<Ingredient> initIngredientCache() throws ServiceException{
 		ingredientsCache = new HashMap<>();
@@ -65,7 +65,6 @@ public class BreakfastController extends AbtractController{
 	}
 	
 	private Map<String, User> usersCache;
-	
 	@ModelAttribute("usersCache")
 	private List<User> initUserCache() throws ServiceException{
 		System.out.println("initUserCache");
@@ -77,12 +76,13 @@ public class BreakfastController extends AbtractController{
 		}
 		return users;
 	}
-	
+
 	@RequestMapping(value = "/new.html", method = RequestMethod.GET)
 	public ModelAndView add() {
 		ModelAndView modelAndView = new ModelAndView("/admin/breakfast/breakfast");
 		
-		modelAndView.addObject("title", "Ajouter un petit déjeuné");
+		title = "Ajouter un petit déjeuné";
+		modelAndView.addObject("title", title);
 		
 		GregorianCalendar calendar = new java.util.GregorianCalendar(); 
 		calendar.add(Calendar.DATE, 7);
@@ -99,7 +99,8 @@ public class BreakfastController extends AbtractController{
 	public ModelAndView edit(@ModelAttribute("id") Integer id) {
 		ModelAndView modelAndView = new ModelAndView("/admin/breakfast/breakfast");
 		
-		modelAndView.addObject("title", "Ajouter un petit déjeuné");
+		title = "Modifier un petit déjeuné";
+		modelAndView.addObject("title", title);
 		try {
 			modelAndView.addObject("breakfast", breakfastService.findByIdWithIngredients(id));
 		} catch (ServiceException e) {
@@ -149,43 +150,35 @@ public class BreakfastController extends AbtractController{
 
 	@RequestMapping(value = "/save.html", method = RequestMethod.POST)
 	public ModelAndView save(@Valid @ModelAttribute("breakfast") Breakfast breakfast, BindingResult result){
-		System.out.println("save");
+		ModelAndView modelAndView = new ModelAndView("/admin/breakfast/breakfast");
+		modelAndView.addObject("title", title);
+		modelAndView.addObject("breakfast", breakfast);
 		try {
+			BreakfastCheckin.checkBreakfast(breakfast, result);
+		} catch (FormException e) {
+			modelAndView.addObject("errors", e.getErrors());
+			for(Entry<String, FormExceptionFeedBack> entry : e.getFeedBacks().entrySet()) {
+				modelAndView.addObject("fb" + entry.getKey(), "has-" + entry.getValue().toString().toLowerCase());
+			}
+			return modelAndView;
+		}
 
+
+		try {
+			if (breakfast.getOrganizer() == null) breakfast.setOrganizer(getUser());
+			
 			if (!breakfastService.AllowAdministration(getUser(), breakfast)){
 				throw new ForbiddenException("Vous n'avez pas le droit d'éditer " + breakfast.getName());
 			}
-			
-			try {
-				BreakfastCheckin.checkBreakfast(breakfast);
+			breakfastService.save(breakfast);
+			return new ModelAndView("redirect:list.html");
 				
-				
-				if (breakfast.getOrganizer() == null) breakfast.setOrganizer(getUser());
-				
-				breakfastService.save(breakfast);
-				
-				ModelAndView modelAndView = new ModelAndView("redirect:list.html");
-				return modelAndView;
-				
-			} catch (FormException e) {
-
-				ModelAndView modelAndView = new ModelAndView("/admin/breakfast/breakfast");
-				
-				modelAndView.addObject("breakfast", breakfast);
-				modelAndView.addObject("title", "Ajouter un petit déjeuné");
-				modelAndView.addObject("errors", e.getErrors());
-				
-				for(Entry<String, FormExceptionFeedBack> entry : e.getFeedBacks().entrySet()) {
-					modelAndView.addObject("fb" + entry.getKey(), "has-" + entry.getValue().toString().toLowerCase());
-				}
-
-				return modelAndView;
-			}
-			
-		} catch (ServiceException e) {
-			ModelAndView modelAndView = edit(breakfast.getId());
-			modelAndView.addObject("error", e.getMessage());
+		} catch (Exception e) {
+			List<String> errors = new ArrayList<>();
+			errors.add(e.getMessage());
+			modelAndView.addObject("errors", errors);
 			return modelAndView;
+
 		}
 
 	}

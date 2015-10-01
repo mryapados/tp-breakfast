@@ -14,6 +14,9 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
+
 
 @Entity
 @Table(name = "user")
@@ -31,15 +34,18 @@ public abstract class User implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
+	@SafeHtml(whitelistType = WhiteListType.NONE)
 	@Column(name = "login")
 	private String login;
 
+	@SafeHtml(whitelistType = WhiteListType.NONE)
 	@Column(name = "encrypted_password")
 	private String encryptedPassword;
 
 	@Column(name = "enabled")
 	private Boolean enabled;
 	
+	@SafeHtml(whitelistType = WhiteListType.NONE)
 	@Column(name = "role")
 	private String role;
 

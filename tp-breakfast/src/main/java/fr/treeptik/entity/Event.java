@@ -17,6 +17,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
+
 @Entity
 @Table(name = "event")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -35,6 +38,7 @@ public class Event implements Serializable {
 	@Column
 	private Float price;
 	
+	@SafeHtml(whitelistType = WhiteListType.SIMPLE_TEXT)
 	@Column
 	private String comment;
 	

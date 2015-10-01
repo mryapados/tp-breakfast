@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolationException;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import fr.treeptik.dao.BreakfastDao;
@@ -26,7 +28,7 @@ public class BreakfastService {
 	@Autowired
 	private BreakfastDao breakfastDao;
 
-	@Transactional
+	@Transactional()
 	public Breakfast save(Breakfast breakfast) throws ServiceException {
 		logger.debug("appel de la methode save Breakfast " + breakfast.toString());
 		try {
@@ -34,6 +36,12 @@ public class BreakfastService {
 		} catch (PersistenceException e) {
 			logger.error("erreur save Breakfast " + e.getMessage());
 			throw new ServiceException("erreur save Breakfast", e);
+		} catch (ConstraintViolationException e) {
+			logger.error("erreur save Breakfast " + e.getMessage());
+			throw new ServiceException("erreur save Breakfast", e);
+		} catch (Exception e) {
+			logger.error("erreur remove Breakfast " + e.getMessage());
+			throw new ServiceException("erreur remove Breakfast", e);
 		}
 	}
 

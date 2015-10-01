@@ -11,15 +11,20 @@ import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
+
 @Entity
 @DiscriminatorValue(value = "member")
 public class Member extends User {
 
 	private static final long serialVersionUID = 1L;
 	
+	@SafeHtml(whitelistType = WhiteListType.SIMPLE_TEXT)
 	@Column(name = "first_name")
 	String firstName;
 	
+	@SafeHtml(whitelistType = WhiteListType.SIMPLE_TEXT)
 	@Column(name = "last_name")
 	String lastName;
 	

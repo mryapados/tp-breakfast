@@ -9,10 +9,13 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.SafeHtml;
+import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
+
 
 @Entity
 @Table(name = "breakfast")
@@ -21,6 +24,7 @@ public class Breakfast extends Event {
 
 	private static final long serialVersionUID = 1L;
 	
+	@SafeHtml(whitelistType = WhiteListType.SIMPLE_TEXT)
 	@NotNull
 	@Column
 	private String name;
