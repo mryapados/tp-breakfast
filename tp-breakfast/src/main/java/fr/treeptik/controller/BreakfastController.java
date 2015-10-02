@@ -250,7 +250,7 @@ public class BreakfastController extends AbtractController{
 	@InitBinder
 	protected void initBinderDate(WebDataBinder binder) {
 		System.out.println("initBinderDate");
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 		dateFormat.setLenient(false);
 		binder.registerCustomEditor(Date.class, "date", new CustomDateEditor(dateFormat, true));
 	}

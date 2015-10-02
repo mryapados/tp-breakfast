@@ -23,8 +23,8 @@
 		<div class="form-group<c:if test="${not empty fbDate}"> ${fbDate}</c:if>">
 			<label class="control-label col-sm-2" for="name">Date :</label>
 			<div class="col-sm-10">
-				<fmt:formatDate value="${breakfast.date}" type="date" pattern="dd-MM-yyyy" var="formattedDate" />
-				<form:input type="text" path="date" value="${formattedDate}" class="form-control" placeholder="Date" />
+				<fmt:formatDate value="${breakfast.date}" type="date" pattern="dd/MM/yyyy" var="formattedDate" />
+				<form:input type="date" path="date" value="${formattedDate}" class="form-control" placeholder="Date" />
 			</div>
 		</div>
 		
